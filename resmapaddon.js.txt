@@ -10,6 +10,7 @@
 // ==/UserScript==
 
 $(document).ready(function() {
+  function AddBtnToPanel(){
     var dall=$("<div class='button_box' id='btnClearAll'>Clear All mines</div>");
     var dvisible=$("<div class='button_box' id='btnClearVisible'>Clear not visible mines</div>");
     var dmin=$("<div class='button_box' id='btnClearMin'>Clear<br>min<br>quality</div>");
@@ -25,7 +26,7 @@ $(document).ready(function() {
               "color":"white"
           });
     dvisible.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
-           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white",  "vertical-align":"middle", "vertical-align":"middle"
+           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white",  "vertical-align":"middle"
           });
     dmin.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
            "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white", "vertical-align":"middle"
@@ -101,4 +102,7 @@ $(document).ready(function() {
         }
       }
     });
+  }
+
+  AddBtnToPanel(); // Запуск добавления
 });
