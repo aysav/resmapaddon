@@ -1,0 +1,104 @@
+// ==UserScript==
+// @name         resmapaddon
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://res.anti3z.ru/
+// @require    http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
+// @require    http://cdnjs.cloudflare.com/ajax/libs/sugar/1.3/sugar.min.js
+// ==/UserScript==
+
+$(document).ready(function() {
+    var dall=$("<div class='button_box' id='btnClearAll'>Clear All mines</div>");
+    var dvisible=$("<div class='button_box' id='btnClearVisible'>Clear not visible mines</div>");
+    var dmin=$("<div class='button_box' id='btnClearMin'>Clear<br>min<br>quality</div>");
+    //var b=$("#scan_btn");
+    dall.css({"width": "74px",
+              "height": "55px",
+              "border": "1px solid red",
+              "border-radius": "6px",
+              "text-align": "center",
+              "cursor": "pointer",
+              "background":"linear-gradient(to top, #f72e3c, #400000)",
+              "vertical-align":"middle",
+              "color":"white"
+          });
+    dvisible.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
+           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white",  "vertical-align":"middle", "vertical-align":"middle"
+          });
+    dmin.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
+           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white", "vertical-align":"middle"
+          });
+
+    $("#tool_selector_bar").css({"height":"476", "width":"76"});
+    $("#tool_selector_bar").append(dall);
+    $("#tool_selector_bar").append(dvisible);
+    $("#tool_selector_bar").append(dmin);
+
+    dvisible.click(function(){
+        if (cntMines>0) {
+            if (confirm("Clear visible?")){
+                var keys = [];
+                $.each(Mines, function( key, Mine ) {
+                    //Если шахта в пределах видимой карты
+                    if (!map.getBounds().contains(Mine.getBounds().getCenter())) {
+                       keys.push(key);
+                    }
+                });
+                keys.reverse();
+                $.each(keys, function( i, v) {
+                   DeleteMineByKey(v);
+                });
+                InfoBarUpdate();
+            }
+        }
+    });
+
+    function DeleteMineByKey(key){
+        Mines[key].setMap(null);
+        MineInfoWindow[key].close();
+        Mines.splice(key,1);
+        MineInfoWindow.splice(key,1);
+        cntMines--;
+    }
+
+    dmin.click(function(){
+        var perc = prompt('Min quality %?', 25);
+
+        if (!isNaN(perc)){
+            var keys = [];
+            $.each(Mines, function( key, Mine ) {
+                if (Mine!== undefined) {
+                    if ("quality" in Mine){
+                        if (Mine.quality*100<perc){
+                           console.log(Mine);
+                           keys.push(key);
+                        }
+                    }
+                }
+            });
+            keys.reverse();
+            $.each(keys, function( i, v) {
+                DeleteMineByKey(v);
+            });
+            InfoBarUpdate();
+        }
+    });
+
+    dall.click(function(){
+      if (cntMines>0) {
+        if (confirm("Clear all?")){
+            $.each(Mines, function( key, Mine ) {
+                Mine.setMap(null);
+                MineInfoWindow[key].close();
+                cntMines--;
+            });
+            Mines.splice(0, Mines.length);
+            MineInfoWindow.splice(0, MineInfoWindow.length);
+            cntMines=0;
+            InfoBarUpdate();
+        }
+      }
+    });
+});
