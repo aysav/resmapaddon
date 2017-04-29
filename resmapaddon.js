@@ -42,7 +42,7 @@ $(document).ready(function() {
             if (confirm("Clear visible?")){
                 var keys = [];
                 $.each(Mines, function( key, Mine ) {
-                    //Если шахта в пределах видимой карты
+                    //РїСЂРѕРІРµСЂРєР° РЅР° РІС–РґС–РјРѕСЃС‚СЊ РЅР° РєР°СЂС‚Рµ
                     if (!map.getBounds().contains(Mine.getBounds().getCenter())) {
                        keys.push(key);
                     }
@@ -104,5 +104,5 @@ $(document).ready(function() {
     });
   }
 
-  AddBtnToPanel(); // Запуск добавления
+  AddBtnToPanel(); // Р·Р°РїСѓСЃРє
 });
