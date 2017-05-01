@@ -7,8 +7,8 @@
 // @match        https://res.anti3z.ru/
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
 // @require      http://cdnjs.cloudflare.com/ajax/libs/sugar/1.3/sugar.min.js
-// @require      http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @resource     customCSS http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css
+// --require      http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
+// --resource     customCSS http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
