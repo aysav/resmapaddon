@@ -19,9 +19,9 @@ GM_addStyle("ul{list-style:none;margin-left: 0px;}");
 GM_addStyle(".cf:before, .cf:after {content: ' '; display: table; } .cf:after {clear: both;} .cf {*zoom: 1;}");
 GM_addStyle("ul.navbar {font: 9px 'open sans', Arial, sans-serif;width: 66px;margin: 0em auto;padding: 0px;background: rgb(220, 220, 220);}");
 GM_addStyle("ul.navbar li {float: left;margin: 0;padding: 0;position: relative;}");
-GM_addStyle("ul.navbar li a {display: block;width:100px;padding: 13px 15px;color: #777 !important;text-decoration: none;text-transform: uppercase;transition: all .2s ease-in-out;}");
+GM_addStyle("ul.navbar li a {display: block;padding: 13px 15px;color: #777 !important;text-decoration: none;text-transform: uppercase;transition: all .2s ease-in-out;}");
 GM_addStyle("ul.navbar li a:hover, ul.navbar li:hover > a {background: #930659;color: #fff !important;}");
-GM_addStyle("ul.navbar li ul {margin: 0;position: absolute;background: #222;left: 10%;font-size: 10px;opacity: 0;visibility: hidden;z-index: 99;transition: all .1s ease}");
+GM_addStyle("ul.navbar li ul {margin: 0;position: absolute;background: #222;left: 10%;font-size: 10px;opacity: 0;visibility: hidden;z-index: 99;transition: all .1s ease;width:140px;}");
 GM_addStyle("ul.navbar ul li { float: none; }");
 GM_addStyle("ul.navbar li:hover > ul { opacity: 1; visibility: visible; left: 0; max-height: 250px }");
 GM_addStyle("ul.navbar > li:hover > ul { opacity: 1; visibility: visible; top: 100%; left: 0; }");
@@ -128,28 +128,105 @@ $(document).ready(function() {
       var menu=$("<ul class='navbar cf' id='MyPanelServic' style='position: absolute;top:70px;left:10px;'></ul>"); // class='navbar cf'
       var item=$("<li id='mservic'><a href='#'>Сервис</a></li>");
       var submenu=$("<ul></ul>");
+      var item0=$("<li><a href='#' id='mscan'>сканирование</a></li><li><a href='#' id='mautoplace'>Автоустановка шахт</a></li>");
       var item1=$("<li id='minfo'><a href='#'>Информация</a></li>");
       var item2=$("<li id='mdelmines'><a href='#'>Удаление шахт</a></li>");
       var item3=$("<li id='mshtab'><a href='#'>Штаб</a></li>");
 
-      var submenu2=$("<ul><li><a href='#'>по установленным шахтам</a></li><li><a href='#'>по шахтам под штабом</a></li></ul>");
-      var submenu3=$("<ul><li><a href='#'>Удаление всех шахт</a></li><li><a href='#'>Удаление не видимых шахт</a></li><li><a href='#'>Удаление шахт ниже %</a></li></ul>");
+      var submenu2=$("<ul><li><a href='#' id='minfo'>по установленным шахтам</a></li><li><a href='#'>по шахтам под штабом</a></li></ul>");
+      var submenu3=$("<ul><li><a href='#' id='mDelAllMines'>Удаление всех шахт</a></li><li><a href='#' id='mDelNotVisible'>Удаление не видимых шахт</a></li><li><a href='#' id='mDelPerc'>Удаление шахт ниже %</a></li></ul>");
       var submenu4=$("<ul><li><a href='#'>6</a></li><li><a href='#'>7</a></li><li><a href='#'>8</a></li><li><a href='#'>9</a></li><li><a href='#'>10</a></li></ul>");
 
       item1.append(submenu2);
       item2.append(submenu3);
       item3.append(submenu4);
+      submenu.append(item0);
       submenu.append(item1);
       submenu.append(item2);
       submenu.append(item3);
 
       item.append(submenu);
       menu.append(item);
-      //menu.append(submenu);
-
       $("#map_canvas").append(menu);
-      //$("#MyPanelServic").menu();
+
+      function DeleteMineByKey(key){
+         Mines[key].setMap(null);
+         MineInfoWindow[key].close();
+         Mines.splice(key,1);
+         MineInfoWindow.splice(key,1);
+         cntMines--;
+      }
+
+      $('#mDelAllMines').click(function(){
+          if (cntMines>0) {
+              if (confirm("Clear all?")){
+                  $.each(Mines, function( key, Mine ) {
+                      Mine.setMap(null);
+                      MineInfoWindow[key].close();
+                      cntMines--;
+                  });
+                  Mines.splice(0, Mines.length);
+                  MineInfoWindow.splice(0, MineInfoWindow.length);
+                  cntMines=0;
+                  InfoBarUpdate();
+              }
+          }
+      });
+
+      $('#mDelNotVisible').click(function(){
+          if (cntMines>0) {
+            if (confirm("Clear visible?")){
+                var keys = [];
+                $.each(Mines, function( key, Mine ) {
+                    //Если шахта в пределах видимой карты
+                    if (!map.getBounds().contains(Mine.getBounds().getCenter())) {
+                       keys.push(key);
+                    }
+                });
+                keys.reverse();
+                $.each(keys, function( i, v) {
+                   DeleteMineByKey(v);
+                });
+                InfoBarUpdate();
+            }
+        }
+      });
+
+      $('#mDelPerc').click(function(){
+          var perc = prompt('Min quality %?', 25);
+
+          if (!isNaN(perc)){
+            var keys = [];
+            $.each(Mines, function( key, Mine ) {
+                if (Mine!== undefined) {
+                    if ("quality" in Mine){
+                        if (Mine.quality*100<perc){
+                           console.log(Mine);
+                           keys.push(key);
+                        }
+                    }
+                }
+            });
+            keys.reverse();
+            $.each(keys, function( i, v) {
+                DeleteMineByKey(v);
+            });
+            InfoBarUpdate();
+        }
+      });
+
+      $("#mautoplace").click(function (){
+          AutoPlaceClick_handler();
+      });
+
+      $("#mscan").click(function (){
+          ScanClick_handler();
+      });
+
+      $("#minfo").click(function (){
+          InfoClick_handler();
+      });
   }
-  AddBtnToPanel(); // Запуск добавления
+  //AddBtnToPanel(); // Запуск добавления
   AddMyResPanel(); // Добавление панели
 });
