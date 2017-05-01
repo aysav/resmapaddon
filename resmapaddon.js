@@ -5,9 +5,29 @@
 // @description  try to take over the world!
 // @author       You
 // @match        https://res.anti3z.ru/
-// @require    http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
-// @require    http://cdnjs.cloudflare.com/ajax/libs/sugar/1.3/sugar.min.js
+// @require      http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
+// @require      http://cdnjs.cloudflare.com/ajax/libs/sugar/1.3/sugar.min.js
+// @require      http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
+// @resource     customCSS http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css
+// @grant        GM_addStyle
+// @grant        GM_getResourceText
 // ==/UserScript==
+//var newCSS = GM_getResourceText ("customCSS");
+//GM_addStyle (newCSS);
+
+GM_addStyle("ul{list-style:none;margin-left: 0px;}");
+GM_addStyle(".cf:before, .cf:after {content: ' '; display: table; } .cf:after {clear: both;} .cf {*zoom: 1;}");
+GM_addStyle("ul.navbar {font: 9px 'open sans', Arial, sans-serif;width: 66px;margin: 0em auto;padding: 0px;background: rgb(220, 220, 220);}");
+GM_addStyle("ul.navbar li {float: left;margin: 0;padding: 0;position: relative;}");
+GM_addStyle("ul.navbar li a {display: block;width:100px;padding: 13px 15px;color: #777 !important;text-decoration: none;text-transform: uppercase;transition: all .2s ease-in-out;}");
+GM_addStyle("ul.navbar li a:hover, ul.navbar li:hover > a {background: #930659;color: #fff !important;}");
+GM_addStyle("ul.navbar li ul {margin: 0;position: absolute;background: #222;left: 10%;font-size: 10px;opacity: 0;visibility: hidden;z-index: 99;transition: all .1s ease}");
+GM_addStyle("ul.navbar ul li { float: none; }");
+GM_addStyle("ul.navbar li:hover > ul { opacity: 1; visibility: visible; left: 0; max-height: 250px }");
+GM_addStyle("ul.navbar > li:hover > ul { opacity: 1; visibility: visible; top: 100%; left: 0; }");
+GM_addStyle("ul.navbar li > ul  ul { top: 0; left: 90%; }");
+GM_addStyle("ul.navbar li > ul li:hover > ul { left: 100%; }");
+GM_addStyle("ul.navbar li > ul {padding: 0px}");
 
 $(document).ready(function() {
   function AddBtnToPanel(){
@@ -42,7 +62,7 @@ $(document).ready(function() {
             if (confirm("Clear visible?")){
                 var keys = [];
                 $.each(Mines, function( key, Mine ) {
-                    //проверка на відімость на карте
+                    //Если шахта в пределах видимой карты
                     if (!map.getBounds().contains(Mine.getBounds().getCenter())) {
                        keys.push(key);
                     }
@@ -104,5 +124,32 @@ $(document).ready(function() {
     });
   }
 
-  AddBtnToPanel(); // запуск
+  function AddMyResPanel(){
+      var menu=$("<ul class='navbar cf' id='MyPanelServic' style='position: absolute;top:70px;left:10px;'></ul>"); // class='navbar cf'
+      var item=$("<li id='mservic'><a href='#'>Сервис</a></li>");
+      var submenu=$("<ul></ul>");
+      var item1=$("<li id='minfo'><a href='#'>Информация</a></li>");
+      var item2=$("<li id='mdelmines'><a href='#'>Удаление шахт</a></li>");
+      var item3=$("<li id='mshtab'><a href='#'>Штаб</a></li>");
+
+      var submenu2=$("<ul><li><a href='#'>по установленным шахтам</a></li><li><a href='#'>по шахтам под штабом</a></li></ul>");
+      var submenu3=$("<ul><li><a href='#'>Удаление всех шахт</a></li><li><a href='#'>Удаление не видимых шахт</a></li><li><a href='#'>Удаление шахт ниже %</a></li></ul>");
+      var submenu4=$("<ul><li><a href='#'>6</a></li><li><a href='#'>7</a></li><li><a href='#'>8</a></li><li><a href='#'>9</a></li><li><a href='#'>10</a></li></ul>");
+
+      item1.append(submenu2);
+      item2.append(submenu3);
+      item3.append(submenu4);
+      submenu.append(item1);
+      submenu.append(item2);
+      submenu.append(item3);
+
+      item.append(submenu);
+      menu.append(item);
+      //menu.append(submenu);
+
+      $("#map_canvas").append(menu);
+      //$("#MyPanelServic").menu();
+  }
+  AddBtnToPanel(); // Запуск добавления
+  AddMyResPanel(); // Добавление панели
 });
