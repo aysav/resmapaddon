@@ -17,9 +17,9 @@
 
 GM_addStyle("ul{list-style:none;margin-left: 0px;}");
 GM_addStyle(".cf:before, .cf:after {content: ' '; display: table; } .cf:after {clear: both;} .cf {*zoom: 1;}");
-GM_addStyle("ul.navbar {font: 9px 'open sans', Arial, sans-serif;width: 66px;margin: 0em auto;padding: 0px;background: rgb(220, 220, 220);}");
+GM_addStyle("ul.navbar {font: 9px 'open sans', Arial, sans-serif;width: 66px;margin: 0em auto;padding: 0px;background: rgb(255, 255, 255);box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;}");
 GM_addStyle("ul.navbar li {float: left;margin: 0;padding: 0;position: relative;}");
-GM_addStyle("ul.navbar li a {display: block;padding: 13px 15px;color: #777 !important;text-decoration: none;text-transform: uppercase;transition: all .2s ease-in-out;}");
+GM_addStyle("ul.navbar li a {display: block;padding: 8px 15px;color: #777 !important;text-decoration: none;text-transform: uppercase;transition: all .2s ease-in-out;}");
 GM_addStyle("ul.navbar li a:hover, ul.navbar li:hover > a {background: #930659;color: #fff !important;}");
 GM_addStyle("ul.navbar li ul {margin: 0;position: absolute;background: #222;left: 10%;font-size: 10px;opacity: 0;visibility: hidden;z-index: 99;transition: all .1s ease;width:140px;}");
 GM_addStyle("ul.navbar ul li { float: none; }");
@@ -30,99 +30,6 @@ GM_addStyle("ul.navbar li > ul li:hover > ul { left: 100%; }");
 GM_addStyle("ul.navbar li > ul {padding: 0px}");
 
 $(document).ready(function() {
-  function AddBtnToPanel(){
-    var dall=$("<div class='button_box' id='btnClearAll'>Clear All mines</div>");
-    var dvisible=$("<div class='button_box' id='btnClearVisible'>Clear not visible mines</div>");
-    var dmin=$("<div class='button_box' id='btnClearMin'>Clear<br>min<br>quality</div>");
-    //var b=$("#scan_btn");
-    dall.css({"width": "74px",
-              "height": "55px",
-              "border": "1px solid red",
-              "border-radius": "6px",
-              "text-align": "center",
-              "cursor": "pointer",
-              "background":"linear-gradient(to top, #f72e3c, #400000)",
-              "vertical-align":"middle",
-              "color":"white"
-          });
-    dvisible.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
-           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white",  "vertical-align":"middle"
-          });
-    dmin.css({"width": "74px", "height": "55px", "border": "1px solid red", "border-radius": "6px", "text-align": "center", "cursor": "pointer",
-           "background":"linear-gradient(to top, #f72e3c, #400000)", "color":"white", "vertical-align":"middle"
-          });
-
-    $("#tool_selector_bar").css({"height":"476", "width":"76"});
-    $("#tool_selector_bar").append(dall);
-    $("#tool_selector_bar").append(dvisible);
-    $("#tool_selector_bar").append(dmin);
-
-    dvisible.click(function(){
-        if (cntMines>0) {
-            if (confirm("Clear visible?")){
-                var keys = [];
-                $.each(Mines, function( key, Mine ) {
-                    //Если шахта в пределах видимой карты
-                    if (!map.getBounds().contains(Mine.getBounds().getCenter())) {
-                       keys.push(key);
-                    }
-                });
-                keys.reverse();
-                $.each(keys, function( i, v) {
-                   DeleteMineByKey(v);
-                });
-                InfoBarUpdate();
-            }
-        }
-    });
-
-    function DeleteMineByKey(key){
-        Mines[key].setMap(null);
-        MineInfoWindow[key].close();
-        Mines.splice(key,1);
-        MineInfoWindow.splice(key,1);
-        cntMines--;
-    }
-
-    dmin.click(function(){
-        var perc = prompt('Min quality %?', 25);
-
-        if (!isNaN(perc)){
-            var keys = [];
-            $.each(Mines, function( key, Mine ) {
-                if (Mine!== undefined) {
-                    if ("quality" in Mine){
-                        if (Mine.quality*100<perc){
-                           console.log(Mine);
-                           keys.push(key);
-                        }
-                    }
-                }
-            });
-            keys.reverse();
-            $.each(keys, function( i, v) {
-                DeleteMineByKey(v);
-            });
-            InfoBarUpdate();
-        }
-    });
-
-    dall.click(function(){
-      if (cntMines>0) {
-        if (confirm("Clear all?")){
-            $.each(Mines, function( key, Mine ) {
-                Mine.setMap(null);
-                MineInfoWindow[key].close();
-                cntMines--;
-            });
-            Mines.splice(0, Mines.length);
-            MineInfoWindow.splice(0, MineInfoWindow.length);
-            cntMines=0;
-            InfoBarUpdate();
-        }
-      }
-    });
-  }
 
   function AddMyResPanel(){
       var menu=$("<ul class='navbar cf' id='MyPanelServic' style='position: absolute;top:70px;left:10px;'></ul>"); // class='navbar cf'
@@ -159,7 +66,7 @@ $(document).ready(function() {
 
       $('#mDelAllMines').click(function(){
           if (cntMines>0) {
-              if (confirm("Clear all?")){
+              if (confirm("Удалить все шахты?")){
                   $.each(Mines, function( key, Mine ) {
                       Mine.setMap(null);
                       MineInfoWindow[key].close();
@@ -175,7 +82,7 @@ $(document).ready(function() {
 
       $('#mDelNotVisible').click(function(){
           if (cntMines>0) {
-            if (confirm("Clear visible?")){
+            if (confirm("Удалить все не видимые шахты?")){
                 var keys = [];
                 $.each(Mines, function( key, Mine ) {
                     //Если шахта в пределах видимой карты
@@ -193,7 +100,7 @@ $(document).ready(function() {
       });
 
       $('#mDelPerc').click(function(){
-          var perc = prompt('Min quality %?', 25);
+          var perc = prompt('Минимальный процент?', 25);
 
           if (!isNaN(perc)){
             var keys = [];
@@ -227,6 +134,6 @@ $(document).ready(function() {
           InfoClick_handler();
       });
   }
-  //AddBtnToPanel(); // Запуск добавления
+ 
   AddMyResPanel(); // Добавление панели
 });
