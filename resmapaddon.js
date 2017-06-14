@@ -3,8 +3,8 @@
 // @category      Info
 // @version       0.3
 // @namespace     https://github.com/aysav/resmapaddon
-// @updateURL     https://github.com/aysav/resmapaddon/blob/master/resmapaddon.js
-// @downloadURL   https://github.com/aysav/resmapaddon/blob/master/resmapaddon.js
+// @updateURL     https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
+// @downloadURL   https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
 // @author       You
 // @match        https://res.anti3z.ru/
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
