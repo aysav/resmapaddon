@@ -1,8 +1,10 @@
 // ==UserScript==
-// @name         resmapaddon
-// @namespace    http://tampermonkey.net/
-// @version      0.2
-// @description  try to take over the world!
+// @name          resmapaddon
+// @category      Info
+// @version       0.3
+// @namespace     https://github.com/aysav/resmapaddon
+// @updateURL     https://github.com/aysav/resmapaddon/blob/master/resmapaddon.js
+// @downloadURL   https://github.com/aysav/resmapaddon/blob/master/resmapaddon.js
 // @author       You
 // @match        https://res.anti3z.ru/
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
