@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         resmapaddon
 // @category     Info
-// @version      0.4
+// @version      0.5
 // @namespace    https://github.com/aysav/resmapaddon
 // @updateURL    https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.meta.js
 // @downloadURL  https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
