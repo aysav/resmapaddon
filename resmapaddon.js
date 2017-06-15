@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name          resmapaddon
-// @category      Info
-// @version       0.3
-// @namespace     https://github.com/aysav/resmapaddon
-// @updateURL     https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
-// @downloadURL   https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
+// @name         resmapaddon
+// @category     Info
+// @version      0.4
+// @namespace    https://github.com/aysav/resmapaddon
+// @updateURL    https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.meta.js
+// @downloadURL  https://raw.githubusercontent.com/aysav/resmapaddon/master/resmapaddon.js
+// @description  try to take over the world!
 // @author       You
 // @match        https://res.anti3z.ru/
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
@@ -32,7 +33,9 @@ GM_addStyle("ul.navbar li > ul li:hover > ul { left: 100%; }");
 GM_addStyle("ul.navbar li > ul {padding: 0px}");
 
 var urshtab=6;
+var urshtabkoef=[0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10];
 var ShtabCircle;
+var infowindow;
 
 $(document).ready(function() {
   function AddMyResPanel(){
@@ -48,7 +51,7 @@ $(document).ready(function() {
       var submenu2=$("<ul><li><a href='#' id='mvinfo'>по установленным шахтам</a></li><li><a href='#' id='msinfo'>по шахтам под штабом</a></li></ul>");
       var submenu3=$("<ul><li><a href='#' id='mDelAllMines'>Удаление всех шахт</a></li><li><a href='#' id='mDelNotVisible'>Удаление не видимых шахт</a></li><li><a href='#' id='mDelPerc'>Удаление шахт ниже %</a></li></ul>");
       var submenu4=$("<ul><li><a href='#' id='ur6'>6</a></li><li><a href='#' id='ur7'>7</a></li><li><a href='#' id='ur8'>8</a></li><li><a href='#' id='ur9'>9</a></li><li><a href='#' id='ur10'>10</a></li></ul>");
-      var submenu5=$("<ul><li><a href='#' id='mloadmines'>загрузка шахт</a></li><li><a href='#' id='munloadmines'>выгрузка шахт</a></li></ul>");
+      var submenu5=$("<ul><li><a href='#' id='mloadmines'>загрузка шахт</a></li><li><a href='#' id='munloadmines'>выгрузка шахт</a></li><li><a href='#' id='msavemines'>Сохранить шахты</a></li></ul>");
 
       item1.append(submenu2);
       item2.append(submenu3);
@@ -59,7 +62,10 @@ $(document).ready(function() {
       submenu.append(item1);
       submenu.append(item2);
       submenu.append(item3);
-      submenu.append(item4);
+
+      if (supports_html5_storage){
+          submenu.append(item4);
+      }
 
       item.append(submenu);
       menu.append(item);
@@ -73,22 +79,80 @@ $(document).ready(function() {
          cntMines--;
       }
 
+      function supports_html5_storage() {
+          try {
+              return 'localStorage' in window && window['localStorage'] !== null;
+          } catch (e) {
+              return false;
+          }
+      }
+
+      // открыть сохраненные
+      function OpenMines(){
+      }
+
+      // сохранить
+      function SaveMines(){
+           if (!supports_html5_storage()) { return false; }
+           localStorage['mines'] = Mines;
+      }
+
+      $('#msavemines').click(function(){
+          SaveMines();
+      });
+
       // устанавливаем уровень штаба
       $('#mshtab').click(function(e){
           urshtab=Number(e.target.text);
+          SetShtab(map.getCenter(), urshtab);
       });
 
+      // показать информационное окно
+      function ShowInfoWindow(contentString, pos){
+           if (typeof infowindow !== "undefined") {
+               infowindow.close();
+           }
+           infowindow = new google.maps.InfoWindow({
+               content: contentString
+           });
+          if (typeof pos == "undefined") {
+            infowindow.setPosition(ShtabCircle.getBounds().getCenter());
+          } else{
+            infowindow.setPosition(pos);
+          }
+          infowindow.open(map);
+      }
+
+      function FormContenInfoWindow(d){
+          s='<table border=1><tr><td>Ресурс</td><td>Кол шахт</td><td>Добыча</td><td>Ср. произв.</td><td>Добыча*5.05*штаб('+urshtabkoef[urshtab]+')</td></tr>';
+          $.each(d, function(key, dd){
+              if (typeof dd !== "undefined") {
+                s=s+'<tr align="right"><td>'+ mineName[key]+'</td><td>'+dd.kol+'</td><td>'+Math.round(dd.product)+'</td><td>'+Math.round(dd.product/dd.kol)+'</td><td>'+Math.round(dd.product*urshtabkoef[urshtab]*5.05)+'</td></tr>';
+              }
+          });
+          s=s+'</table>';
+          return s;
+      }
       // информаций по шахтам под штабом
       $('#msinfo').click(function(){
           var d=0;
+          var res_data=[];
+
           if (typeof ShtabCircle !== "undefined") {
               $.each(Mines, function( key, Mine ) {
                  // computeDistanceBetween
                   d=google.maps.geometry.spherical.computeDistanceBetween(Mine.getBounds().getCenter(), ShtabCircle.center);
                   if (d<=GetShtabRadius(urshtab)){
-                      console.log(d);
+                      //console.log(d);
+                      if (typeof res_data[Mine.resID]=="undefined"){
+                          res_data[Mine.resID] = new Object;
+                          res_data[Mine.resID] = {kol:0,product:0.0000};
+                      }
+                      res_data[Mine.resID].kol+=1;
+                      res_data[Mine.resID].product+=Mine.product;
                   }
               });
+              ShowInfoWindow(FormContenInfoWindow(res_data));
          }
       });
 
@@ -176,6 +240,7 @@ $(document).ready(function() {
 
       function SetShtab(pos, ur){
          var radius = GetShtabRadius(ur);
+          console.log(pos);
 
          // чистим предыдущее
          if (typeof ShtabCircle !== "undefined") {
